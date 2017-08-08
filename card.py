@@ -50,11 +50,14 @@ class Hand(Deck):
         self.cards =[]
         self.owner = owner
 
-    # Add up ranks of cards in hand
+    # Add up ranks of cards in hand, will figure out calculating ace later
     def eval_hand(self):
         sum = 0
         for card in self.cards:
-            sum += card.rank
+            if card.rank > 10:
+                sum += 10
+            else:
+                sum += card.rank
         return sum
 
 def deal_card(d:Deck, h:Hand):
