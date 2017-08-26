@@ -60,7 +60,7 @@ class Hand(Deck):
 
     '''Prints out the hand value'''
     def getVal(self):
-        print(self.handValue())
+        print("Hand Value: " + str(self.handValue()))
 
     '''Creates a list of cards in the hand and returns the list'''
     def getHand(self):
@@ -72,3 +72,87 @@ class Hand(Deck):
 def deal_card(d:Deck, h:Hand):
     h.hit(d.deal_Card())
 
+class Player:
+    def __init__(self, money = 0):
+        self.win = 0
+        self.loss = 0
+        self.tie = 0
+        self.chips = money
+        self.hand = Hand()
+    
+    def clearHand(self):
+        self.hand = Hand()
+        
+def getStatus(player):
+    print(player.hand.getHand())
+    player.hand.getVal()
+    
+    
+
+def gameLoop(dealer, p):
+    d = Deck()
+    deal_card(d, dealer.hand)
+    deal_card(d, p.hand)
+    deal_card(d, dealer.hand)
+    deal_card(d, p.hand)
+    print("Dealer's Cards")
+    print(dealer.hand.getHand()[1])
+    print("Player's Cards")
+    getStatus(p)
+    
+    while 1:
+        player_move = int(input("1)Hit  2)Stand\n"))
+        while player_move != 1 and player_move != 2:
+            print("Invalid input.")
+            player_move = int(input("Please enter 1 for Hit and 2 for Stand"))
+        if player_move == 1:
+            deal_card(d, p.hand)
+            getStatus(p)
+            if (p.hand.handValue() > 21):
+                print("Bust! \n Dealer wins!")
+                return 0
+        elif player_move == 2:
+            print("Standing")
+            break
+        
+    while int(dealer.hand.handValue() < 17):
+        deal_card(d, dealer.hand)
+    
+    if (int(dealer.hand.handValue() > 21)):
+        getStatus(dealer)
+        print("Dealer Busted, all players win!")
+        return 1
+    elif (int(dealer.hand.handValue()) > int(p.hand.handValue())):
+        getStatus(dealer)
+        print("Dealer wins!")
+        return 0
+    elif (int(dealer.hand.handValue()) < int(p.hand.handValue())):
+        getStatus(dealer)
+        print("Player wins!")
+        return 1
+    else:
+        getStatus(dealer)
+        print("Even Money.")
+        return 3
+
+
+p = Player(1000)
+dealer = Player(1000)
+while 1:
+    result = gameLoop(dealer, p)
+    if result == 1:
+        p.win += 1
+    elif result == 0:
+        p.loss += 1
+    elif result == 3:
+        p.tie += 1
+    print("Wins " + str(p.win) + ", Losses " + str(p.loss) + ", Ties " + str(p.tie))
+    replay = int(input("1)Play Again  2)End\n"))
+    while replay != 1 and replay != 2:
+        print("Invalid input.")
+        replay = int(input("Please enter 1 to replay and 2 to end."))
+    if replay == 1:
+        p.clearHand()
+        dealer.clearHand()
+    elif replay == 2:
+        break
