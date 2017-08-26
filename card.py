@@ -1,74 +1,74 @@
 import random
 
+SUITS = ["Diamonds", "Hearts", "Spade", "Clubs"]
+RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+
 class Card:
-    def __init__(self, suit=0, rank=1):
+    def __init__(self, suit, rank):
         self.suit = suit
         self.rank = rank
 
-    suit_names = ['Clubs','Diamonds','Hearts','Spades']
-    rank_names = [None, 'Ace', '2', '3','4','5','6','7','8','9','10','Jack','Queen','King']
-
     def __str__(self):
-        return '%s of %s' % (Card.rank_names[self.rank], Card.suit_names[self.suit])
+        return (self.rank + " of " + self.suit)
 
-    def __cmp__(self, other):
-        if self.rank > other.rank: return 1
-        if self.rank < other.rank: return -1
-
-        if self.suit > other.suit: return 1
-        if self.suit < other.suit: return -1
-
-        return 0
-
-    def numrank(self):
-        return self.rank
+    def getValue(self):
+        if self.rank == 'J' or self.rank == 'Q' or self.rank == 'K':
+            return 10
+        elif self.rank == 'A':
+            return 11
+        else:
+            return int(self.rank)
 
 
 class Deck:
+    '''Creates a shuffled deck of cards'''
     def __init__(self):
-        self.cards = []
-        for suit in range(4):
-            for rank in range(1,14):
+        self.shoe = []
+        for suit in SUITS:
+            for rank in RANKS:
                 card = Card(suit, rank)
-                self.cards.append(card)
+                self.shoe.append(card)
+        random.shuffle(self.shoe)
 
-    def __str__(self):
-        s = [str(card) for card in self.cards]
-        return '\n'.join(s)
+    def deal_Card(self):
+        return self.shoe.pop()
 
-    def draw_card(self):
-        return self.cards.pop()
-
-    def add_card(self,card):
-        self.cards.append(card)
-
-    def shuffle(self):
-        random.shuffle(self.cards)
+    def deck_size(self):
+        return len(self.shoe)
 
 class Hand(Deck):
-    def __init__(self, owner=''):
-        self.cards =[]
-        self.owner = owner
+    def __init__(self):
+        self.hand = []
 
-    # Add up ranks of cards in hand, will figure out calculating ace later
-    def eval_hand(self):
-        sum = 0
-        for card in self.cards:
-            if card.rank > 10:
-                sum += 10
+    def handValue(self):
+        self.value = 0
+        ace_count = 0
+        for card in self.hand:
+            if card.rank == 'A':
+                ace_count += 1
+            self.value += card.getValue()
+        while ace_count > 0:
+            if self.value > 21:
+                self.value -= 10
+                ace_count -= 1
             else:
-                sum += card.rank
-        return sum
+                return self.value
+        return self.value
 
+    def hit(self, card):
+        self.hand.append(card)
+
+    '''Prints out the hand value'''
+    def getVal(self):
+        print(self.handValue())
+
+    '''Creates a list of cards in the hand and returns the list'''
+    def getHand(self):
+        card_hand = []
+        for card in self.hand:
+            card_hand.append(card.rank + " of " + card.suit)
+        return card_hand
+    
 def deal_card(d:Deck, h:Hand):
-    h.add_card(d.draw_card())
+    h.hit(d.deal_Card())
 
-d = Deck()
-h = Hand()
-d.shuffle()
-deal_card(d,h)
-print(h)
-print(h.eval_hand())
-deal_card(d,h)
-print(h)
-print(h.eval_hand())
