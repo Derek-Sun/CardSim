@@ -150,90 +150,43 @@ def startGame():
         getStatus(p)
         if int(p.hand.handValue()) == 21 and int(dealer.hand.handValue()) == 21:
             tieGame(p)
-            getReplay = replayGame()
-            if getReplay == 1:
-                p.clearHand()
-                dealer.clearHand()
-                continue
-            else:
-                break
         elif int(p.hand.handValue()) == 21 and int(dealer.hand.handValue()) != 21:
             print("Player Blackjack!")
             winGame(p)
-            getReplay = replayGame()
-            if getReplay == 1:
-                p.clearHand()
-                dealer.clearHand()
-                continue
-            else:
-                break
         elif int(p.hand.handValue()) != 21 and int(dealer.hand.handValue()) == 21:
             print("Dealer Blackjack!")
             loseGame(p)
-            getReplay = replayGame()
-            if getReplay == 1:
-                p.clearHand()
-                dealer.clearHand()
-                continue
-            else:
-                break
         else:
             bust = getPlayerMove(p, d)
             if bust == 1:
                print("Bust! \nDealer wins!")
-               getReplay = replayGame()
-               if getReplay == 1:
-                  p.clearHand()
-                  dealer.clearHand()
-                  continue
-               else:
-                  break
+               loseGame(p)
             else:
                 print("Standing")
-            while int(dealer.hand.handValue() < 17):
-                deal_card(d, dealer.hand)
+                while int(dealer.hand.handValue() < 17):
+                    deal_card(d, dealer.hand)
 
-            if (int(dealer.hand.handValue() > 21)):
-                getStatus(dealer)
-                print("Dealer Busted!")
-                winGame(p)
-                getReplay = replayGame()
-                if getReplay == 1:
-                    p.clearHand()
-                    dealer.clearHand()
-                    continue
+                if (int(dealer.hand.handValue() > 21)):
+                    getStatus(dealer)
+                    print("Dealer Busted!")
+                    winGame(p)
+                elif (int(dealer.hand.handValue()) > int(p.hand.handValue())):
+                    getStatus(dealer)
+                    loseGame(p)
+                elif (int(dealer.hand.handValue()) < int(p.hand.handValue())):
+                    getStatus(dealer)
+                    winGame(p)
                 else:
-                    break
-            elif (int(dealer.hand.handValue()) > int(p.hand.handValue())):
-                getStatus(dealer)
-                loseGame(p)
-                getReplay = replayGame()
-                if getReplay == 1:
-                    p.clearHand()
-                    dealer.clearHand()
-                    continue
-                else:
-                    break
-            elif (int(dealer.hand.handValue()) < int(p.hand.handValue())):
-                getStatus(dealer)
-                winGame(p)
-                getReplay = replayGame()
-                if getReplay == 1:
-                    p.clearHand()
-                    dealer.clearHand()
-                    continue
-                else:
-                    break
-            else:
-                getStatus(dealer)
-                tieGame(p)
-                getReplay = replayGame()
-                if getReplay == 1:
-                    p.clearHand()
-                    dealer.clearHand()
-                    continue
-                else:
-                    break
+                    getStatus(dealer)
+                    tieGame(p)
+
+        getReplay = replayGame()
+        if getReplay == 1:
+            p.clearHand()
+            dealer.clearHand()
+            continue
+        else:
+            break
 
 
 startGame()
