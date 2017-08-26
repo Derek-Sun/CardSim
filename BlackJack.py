@@ -112,17 +112,32 @@ def loseGame(p: Player):
 
 def getPlayerMove(p: Player, d: Deck):
     while 1:
-        player_move = int(input("1)Hit  2)Stand\n"))
-        while player_move != 1 and player_move != 2:
+        player_move = int(input("1)Hit  2) Double 3)Stand\n"))
+        while player_move != 1 and player_move != 2 and player_move != 3:
             print("Invalid input.")
-            player_move = int(input("Please enter 1 for Hit and 2 for Stand"))
+            player_move = int(input("Please enter 1 for Hit,  2 for Double, and 3 to Stand"))
         if player_move == 1:
             deal_card(d, p.hand)
             getStatus(p)
             if (p.hand.handValue() > 21):
                 return 1
+        elif player_move == 2:
+            print("Player is doubling down!")
+            deal_card(d, p.hand)
+            getStatus(p)
+            if (p.hand.handValue() > 21):
+                return 1
+            else:
+                return 0
         else:
+            print("Standing")
             return 0
+
+def getPlayerStats(p: Player):
+    total_games = p.win + p.loss + p.tie
+    winPercentage = p.win / total_games
+    print("You have won a total of " + str(p.win) + " games out of " + str(total_games))
+    print("Your winning percentage is " + str(winPercentage))
 
 
     
@@ -162,7 +177,6 @@ def startGame():
                print("Bust! \nDealer wins!")
                loseGame(p)
             else:
-                print("Standing")
                 while int(dealer.hand.handValue() < 17):
                     deal_card(d, dealer.hand)
 
@@ -187,6 +201,6 @@ def startGame():
             continue
         else:
             break
-
+    getPlayerStats(p)
 
 startGame()
