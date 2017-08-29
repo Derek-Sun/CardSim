@@ -78,6 +78,7 @@ class Player:
         self.win = 0
         self.loss = 0
         self.tie = 0
+        self.bet = 0
         self.chips = money
         self.hand = Hand()
     
@@ -99,29 +100,38 @@ def tieGame(p: Player):
      print("Even Money")
      p.tie +=1
      print("Wins " + str(p.win) + ", Losses " + str(p.loss) + ", Ties " + str(p.tie))
+     print("Player currently has " + str(p.chips) + " chips.")
 
 def winGame(p: Player):
     print("Player wins!")
+    p.chips += p.bet
     p.win += 1
     print("Wins " + str(p.win) + ", Losses " + str(p.loss) + ", Ties " + str(p.tie))
+    print("Player currently has " + str(p.chips) + " chips.")
 
 def loseGame(p: Player):
     print("Dealer wins!")
+    p.chips -= p.bet
     p.loss += 1
     print("Wins " + str(p.win) + ", Losses " + str(p.loss) + ", Ties " + str(p.tie))
+    print("Player currently has " + str(p.chips) + " chips.")
 
 def getPlayerMove(p: Player, d: Deck):
     while 1:
         player_move = int(input("1)Hit  2) Double 3)Stand\n"))
         while player_move != 1 and player_move != 2 and player_move != 3:
             print("Invalid input.")
-            player_move = int(input("Please enter 1 for Hit,  2 for Double, and 3 to Stand"))
+            player_move = int(input("Please enter 1 for Hit,  2 for Double, and 3 to Stand:     "))
         if player_move == 1:
             deal_card(d, p.hand)
             getStatus(p)
             if (p.hand.handValue() > 21):
                 return 1
         elif player_move == 2:
+            if p.bet * 2 >= p.chips:
+                print("Player does not have enough chips to double down. Please enter another move.")
+                continue
+            p.bet += p.bet
             print("Player is doubling down!")
             deal_card(d, p.hand)
             getStatus(p)
@@ -138,20 +148,31 @@ def getPlayerStats(p: Player):
     winPercentage = p.win / total_games
     print("You have won a total of " + str(p.win) + " games out of " + str(total_games))
     print("Your winning percentage is " + str(winPercentage))
+    print("You ended the game with $" + str(p.chips) + ".")
 
+def getPlayerBet(p: Player):
+    bet = int(input("How much do you want to bet?   "))
+    while bet > p.chips or bet < 0:
+        bet = int(input("You do not have enough money or this bet is not a valid amount. Please try again.     "))
+    p.bet = bet
 
     
 ''' initiates a game with one player'''
 
 def startGame():
-    p = Player(1000)
-    dealer = Player(1000)
+
+    money = int(input("How much money do you want to exchange for chips?       "))
+    p = Player(money)
+    dealer = Player()
     d = Deck()
+
     count = 0
 
     while 1:
+        print("\n\n")
         print("Game # " + str(count))
         count += 1
+        getPlayerBet(p)
         if (d.deck_size() < 15): #Reshuffle a new deck when shoe is too small
             print("... Reshuffling Deck...")
             d = Deck()
@@ -167,6 +188,7 @@ def startGame():
             tieGame(p)
         elif int(p.hand.handValue()) == 21 and int(dealer.hand.handValue()) != 21:
             print("Player Blackjack!")
+            p.bet = p.bet * 1.5
             winGame(p)
         elif int(p.hand.handValue()) != 21 and int(dealer.hand.handValue()) == 21:
             print("Dealer Blackjack!")
@@ -174,7 +196,7 @@ def startGame():
         else:
             bust = getPlayerMove(p, d)
             if bust == 1:
-               print("Bust! \nDealer wins!")
+               print("Bust!")
                loseGame(p)
             else:
                 while int(dealer.hand.handValue() < 17):
